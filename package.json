@@ -1,0 +1,11 @@
+{
+  "name": "invideo-assignment",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build:wasm": "cd crates/hello_world && ~/.cargo/bin/wasm-pack build --target web --out-dir pkg",
+    "install:frontend": "cd frontend && npm install",
+    "install:wasm": "cd frontend && npm install ../crates/hello_world/pkg"
+  }
+}

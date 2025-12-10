@@ -1,0 +1,16 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Rust workspace
+target/
+crates/*/pkg/
+**/*.wasm
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
