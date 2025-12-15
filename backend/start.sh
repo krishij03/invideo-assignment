@@ -48,6 +48,9 @@ echo -e "${GREEN}🌐 CORS Origins: $CORS_ORIGINS${NC}"
 echo ""
 
 # Start the Phoenix server
+echo -e "${GREEN}🔥 Running migrations...${NC}"
+mix ecto.migrate
+
 echo -e "${GREEN}🔥 Starting Phoenix server on http://localhost:${PORT:-4000}${NC}"
 echo ""
 
