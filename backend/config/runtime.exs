@@ -114,7 +114,7 @@ if config_env() == :prod do
     System.get_env("SECRET_KEY_BASE") ||
       (
         IO.warn("SECRET_KEY_BASE is missing. Using a generated one.")
-        "8+x/randomly/generated/secret/key/base/which/is/long/enough/for/phoenix/to/be/happy/=="
+        "3dX8X+a9X/b2X+c3X+d4X+e5X+f6X+g7X+h8X+i9X+j0X+k1X+l2X+m3X+n4X+o5X="
       )
 
   host = System.get_env("PHX_HOST") || "example.com"
@@ -123,7 +123,9 @@ if config_env() == :prod do
 
   config :backend, BackendWeb.Endpoint,
     server: true,
+    check_origin: false,
     url: [host: host, port: 443, scheme: "https"],
+    secret_key_base: secret_key_base
     http: [
       # Bind on all interfaces (IPv4) to ensure Railway routing works.
       ip: {0, 0, 0, 0},
