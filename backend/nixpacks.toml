@@ -22,4 +22,5 @@ cmds = [
 
 [start]
 # Run migrations before starting the server
-cmd = "mix ecto.migrate && mix run priv/repo/seeds.exs && mix phx.server"
+# Delegate start to the shell script which handles migrations and environment
+cmd = "./start.sh"
