@@ -122,6 +122,7 @@ if config_env() == :prod do
   config :backend, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   config :backend, BackendWeb.Endpoint,
+    server: true,
     url: [host: host, port: 443, scheme: "https"],
     http: [
       # Bind on all interfaces (IPv4) to ensure Railway routing works.
