@@ -33,7 +33,7 @@ config :phoenix, :json_library, Jason
 # CORS
 #
 # Frontend dev server runs on Vite (default http://localhost:5173).
-config :backend, :cors_origins, ["http://localhost:5173"]
+# CORS configuration is handled in runtime.exs to support environment variables
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
