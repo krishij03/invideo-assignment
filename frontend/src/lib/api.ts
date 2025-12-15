@@ -4,7 +4,16 @@
 
 import { getAccessToken } from './supabase';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+  if (url && !url.startsWith('http')) {
+    url = `https://${url}`;
+  }
+  // Remove trailing slash if present
+  return url.replace(/\/$/, '');
+};
+
+const API_BASE_URL = getBaseUrl();
 
 export interface ApiError {
   message: string;
