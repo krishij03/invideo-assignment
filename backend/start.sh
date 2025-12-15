@@ -15,24 +15,18 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}🚀 Starting InVideo Backend...${NC}"
 
 # Check if .env file exists
-if [ ! -f "$ENV_FILE" ]; then
-    echo -e "${RED}❌ Error: .env file not found at $ENV_FILE${NC}"
-    echo -e "${YELLOW}Please create a .env file with the following variables:${NC}"
-    echo "  GEMINI_API_KEY=your_key"
-    echo "  DATABASE_URL=postgres://..."
-    echo "  DATABASE_PREPARE=unnamed"
-    echo "  CORS_ORIGINS=http://localhost:5173"
-    echo ""
-    echo -e "${YELLOW}You can copy from env.example:${NC}"
-    echo "  cp ../env.example .env"
-    exit 1
+# Check if .env file exists
+if [ -f "$ENV_FILE" ]; then
+    # Load environment variables from .env file
+    echo -e "${GREEN}📦 Loading environment from .env...${NC}"
+    set -a  # automatically export all variables
+    source "$ENV_FILE"
+    set +a
+else
+    echo -e "${YELLOW}⚠️ No .env file found. Assuming environment variables are provided by the system.${NC}"
 fi
 
-# Load environment variables from .env file
-echo -e "${GREEN}📦 Loading environment from .env...${NC}"
-set -a  # automatically export all variables
-source "$ENV_FILE"
-set +a
+
 
 # Verify required variables
 MISSING_VARS=0
