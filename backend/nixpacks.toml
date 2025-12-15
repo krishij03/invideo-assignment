@@ -1,0 +1,25 @@
+# Railway / Nixpacks build configuration for Phoenix backend
+
+[variables]
+MIX_ENV = 'prod'
+LANG = 'en_US.UTF-8'
+LC_CTYPE = 'en_US.UTF-8'
+
+[phases.setup]
+nixPkgs = ['erlang_27', 'elixir_1_17']
+
+[phases.install]
+cmds = [
+  'mix local.hex --force',
+  'mix local.rebar --force',
+  'mix deps.get --only prod'
+]
+
+[phases.build]
+cmds = [
+  'mix compile'
+]
+
+[start]
+# Run migrations before starting the server
+cmd = "mix ecto.migrate && mix run priv/repo/seeds.exs && mix phx.server"

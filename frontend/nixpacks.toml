@@ -1,0 +1,20 @@
+# Railway / Nixpacks build configuration for React frontend
+
+[variables]
+NODE_ENV = 'production'
+
+[phases.setup]
+nixPkgs = ['nodejs_20', 'rustc', 'cargo', 'wasm-pack', 'lld']
+
+[phases.install]
+cmds = ['npm ci']
+
+[phases.build]
+cmds = [
+  'npm run build:wasm',
+  'npm run build'
+]
+
+[start]
+cmd = "npx serve -s dist -l ${PORT:-3000}"
+
