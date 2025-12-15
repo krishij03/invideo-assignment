@@ -75,7 +75,7 @@ export function ImageEditor() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    init().then((wasmModule) => {
+    init().then((wasmModule: any) => {
       setWasmReady(true);
       if (wasmModule && 'memory' in wasmModule) {
         setWasmMemory(wasmModule.memory as WasmMemory);
