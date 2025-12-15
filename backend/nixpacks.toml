@@ -22,6 +22,5 @@ cmds = [
 
 [start]
 # Run migrations before starting the server
-# Start command directly runs migrations and server
-# We avoid start.sh in prod to minimize path/permission issues
-cmd = "mix ecto.migrate && mix phx.server"
+# Start command: Server ONLY (skipping migration for debug)
+cmd = "mix phx.server"
