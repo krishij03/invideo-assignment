@@ -22,5 +22,5 @@ cmds = [
 
 [start]
 # Run migrations before starting the server
-# Start command directly runs migrations and server
-cmd = "mix ecto.migrate && mix phx.server"
+# Start command: Server ONLY (skipping migration for stability on port 6543)
+cmd = "mix phx.server"

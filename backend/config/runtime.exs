@@ -87,9 +87,17 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
+  # Use prepare: :unnamed for Supabase transaction mode pooler (port 6543)
+  prepare_mode =
+    case System.get_env("DATABASE_PREPARE", "named") do
+      "unnamed" -> :unnamed
+      _ -> :named
+    end
+
   config :backend, Backend.Repo,
     ssl: [verify: :verify_none],
     url: database_url,
+    prepare: prepare_mode,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     # For machines with several cores, consider starting multiple pools of `pool_size`
     # pool_count: 4,
