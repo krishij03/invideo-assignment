@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Upload, Download, Save, Undo, Redo, RotateCcw, Sliders, Split, ChevronsLeftRight } from 'lucide-react';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorMessage } from '../components/ErrorMessage';
+// @ts-ignore
 import init, * as wasm from 'hello_world';
 import * as api from '../lib/api';
 import { uploadBlob, generateStoragePath, isSupabaseConfigured, STORAGE_BUCKET } from '../lib/supabase';
