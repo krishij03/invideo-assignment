@@ -124,8 +124,8 @@ if config_env() == :prod do
   config :backend, BackendWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
-      # Enable IPv6 and bind on all interfaces.
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
+      # Bind on all interfaces (IPv4) to ensure Railway routing works.
+      ip: {0, 0, 0, 0},
       port: String.to_integer(System.get_env("PORT") || "4000")
     ],
     secret_key_base: secret_key_base
