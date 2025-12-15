@@ -41,8 +41,7 @@ defmodule BackendWeb.Endpoint do
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
-  plug CORSPlug,
-    origin: Application.compile_env(:backend, :cors_origins, ["http://localhost:5173"]),
+  plug BackendWeb.DynamicCORSPlug,
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     headers: ["Authorization", "Content-Type"]
