@@ -125,7 +125,6 @@ if config_env() == :prod do
     server: true,
     check_origin: false,
     url: [host: host, port: 443, scheme: "https"],
-    secret_key_base: secret_key_base
     http: [
       # Bind on all interfaces (IPv4) to ensure Railway routing works.
       ip: {0, 0, 0, 0},

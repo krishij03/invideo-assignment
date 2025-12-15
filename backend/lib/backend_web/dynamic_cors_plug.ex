@@ -5,9 +5,30 @@ defmodule BackendWeb.DynamicCORSPlug do
 
   def call(conn, opts) do
     # Read config at runtime from the Application environment (set by runtime.exs)
-    origins = Application.get_env(:backend, :cors_origins) || ["http://localhost:5173"]
+    configured_origins = Application.get_env(:backend, :cors_origins) || ["http://localhost:5173"]
 
-    # Merge dynamic origin with static optionspassed from endpoint.ex
+    # Handle wildcard "*" - CORSPlug expects a function or specific format for wildcards
+    # If origins contains "*", allow all origins
+    origins =
+      cond do
+        # Single wildcard string
+        configured_origins == "*" ->
+          "*"
+
+        # List containing wildcard
+        is_list(configured_origins) and "*" in configured_origins ->
+          "*"
+
+        # List containing just "*" as the only element
+        configured_origins == ["*"] ->
+          "*"
+
+        # Normal list of origins
+        true ->
+          configured_origins
+      end
+
+    # Merge dynamic origin with static options passed from endpoint.ex
     cors_opts = Keyword.put(opts, :origin, origins)
 
     # Invoke CORSPlug
