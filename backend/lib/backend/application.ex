@@ -4,9 +4,16 @@ defmodule Backend.Application do
   @moduledoc false
 
   use Application
+  require Logger
 
   @impl true
   def start(_type, _args) do
+    Logger.info("Starting Backend Application...")
+    Logger.info("PORT: #{System.get_env("PORT", "4000")}")
+    Logger.info("PHX_HOST: #{System.get_env("PHX_HOST", "not set")}")
+    Logger.info("DATABASE_URL set: #{System.get_env("DATABASE_URL") != nil}")
+    Logger.info("CORS_ORIGINS: #{System.get_env("CORS_ORIGINS", "not set")}")
+
     children = [
       BackendWeb.Telemetry,
       Backend.Repo,
@@ -21,7 +28,11 @@ defmodule Backend.Application do
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Backend.Supervisor]
-    Supervisor.start_link(children, opts)
+    
+    Logger.info("Starting supervisor with #{length(children)} children...")
+    result = Supervisor.start_link(children, opts)
+    Logger.info("Supervisor started: #{inspect(result)}")
+    result
   end
 
   # Tell Phoenix to update the endpoint configuration
