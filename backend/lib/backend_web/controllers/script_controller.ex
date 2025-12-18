@@ -4,19 +4,19 @@ defmodule BackendWeb.ScriptController do
   alias Backend.Scripts
   alias Backend.Accounts
 
-  @default_model "gemini-2.5-flash"
+  @default_model "claude-sonnet-4-20250514"
 
   # Helper to get current user from conn
   defp current_user(conn), do: conn.assigns[:current_user]
 
   # =====================
-  # Generate (Gemini API)
+  # Generate (Anthropic API)
   # =====================
 
   def generate(conn, %{"prompt" => prompt} = params) when is_binary(prompt) do
     require Logger
     Logger.info("Received generate request. Prompt: #{inspect(prompt)}")
-    
+
     prompt = String.trim(prompt)
     user = current_user(conn)
 
@@ -49,61 +49,26 @@ defmodule BackendWeb.ScriptController do
       - Recalculate timestamps to maintain proper sequence when adding new sections.
       """
 
-      # Build conversation contents from history
-      history_contents = build_history_contents(history)
+      # Build conversation messages from history for Anthropic format
+      history_messages = build_anthropic_messages(history)
 
       # Add the current user message
-      current_message = %{
-        "role" => "user",
-        "parts" => [
-          %{
-            "text" =>
-              if(history_contents == [],
-                do: system_instruction <> "\n\nUser prompt:\n" <> prompt,
-                else: prompt
-              )
-          }
-        ]
-      }
+      current_message = %{"role" => "user", "content" => prompt}
+      messages = history_messages ++ [current_message]
 
-      # If we have history, prepend system instruction to first message
-      contents =
-        case history_contents do
-          [] ->
-            [current_message]
-
-          [first | rest] ->
-            # Prepend system instruction to the conversation
-            first_with_system = %{
-              first
-              | "parts" => [
-                  %{"text" => system_instruction <> "\n\n" <> get_first_part_text(first)}
-                ]
-            }
-
-            [first_with_system | rest] ++ [current_message]
-        end
-
-      body = %{"contents" => contents}
-
-      case Backend.Gemini.Client.generate_content(model, body) do
+      case Backend.Anthropic.Client.generate_content(model, messages, system: system_instruction) do
         {:ok, resp_body} ->
-          raw_text =
-            resp_body
-            |> Backend.Gemini.Response.extract_texts()
-            |> Enum.join("\n")
-            |> String.trim()
-
+          raw_text = Backend.Anthropic.Client.extract_text(resp_body)
           json_text = strip_code_fences(raw_text)
 
           case Jason.decode(json_text) do
             {:ok, script} ->
               # Increment usage count on successful generation
               Accounts.increment_script_count(user.id)
-              
+
               # Get updated usage stats
               stats = Accounts.get_usage_stats(user.id)
-              
+
               json(conn, %{data: %{model: model, script: script, usage: stats}})
 
             {:error, _} ->
@@ -118,10 +83,23 @@ defmodule BackendWeb.ScriptController do
               })
           end
 
+        {:error, %{type: :anthropic_http_error, status: 429, body: body} = _err} ->
+          message = get_in(body, ["error", "message"]) || "Anthropic API rate limit exceeded"
+          conn
+          |> put_status(:too_many_requests)
+          |> json(%{
+            error: %{
+              message: "Anthropic API rate limit exceeded. Please wait and try again.",
+              details: message,
+              model: model,
+              code: "RATE_LIMIT_EXCEEDED"
+            }
+          })
+
         {:error, err} ->
           conn
           |> put_status(:bad_gateway)
-          |> json(%{error: %{message: "Gemini request failed", details: err}})
+          |> json(%{error: %{message: "Anthropic request failed", details: err}})
       end
     end
   end
@@ -136,9 +114,6 @@ defmodule BackendWeb.ScriptController do
   # CRUD Operations
   # =====================
 
-  @doc """
-  List all scripts for the current user.
-  """
   @doc """
   List all scripts for the current user.
   """
@@ -278,32 +253,30 @@ defmodule BackendWeb.ScriptController do
     end)
   end
 
-  # Build Gemini conversation contents from history
+  # Build Anthropic conversation messages from history
   # History format: [%{"role" => "user"|"model", "content" => "...", "script" => [...] | nil}]
-  defp build_history_contents(history) when is_list(history) do
+  # Anthropic uses "assistant" instead of "model" for AI responses
+  defp build_anthropic_messages(history) when is_list(history) do
     history
     |> Enum.map(fn turn ->
       role = Map.get(turn, "role", "user")
       content = Map.get(turn, "content", "")
       script = Map.get(turn, "script")
 
-      # For model responses that include a script, include the script JSON
+      # Convert "model" role to "assistant" for Anthropic API
+      anthropic_role = if role == "model", do: "assistant", else: role
+
+      # For assistant responses that include a script, include the script JSON
       text =
-        if role == "model" && script do
+        if anthropic_role == "assistant" && script do
           content <> "\n\n" <> Jason.encode!(script)
         else
           content
         end
 
-      %{
-        "role" => role,
-        "parts" => [%{"text" => text}]
-      }
+      %{"role" => anthropic_role, "content" => text}
     end)
   end
 
-  defp build_history_contents(_), do: []
-
-  defp get_first_part_text(%{"parts" => [%{"text" => text} | _]}), do: text
-  defp get_first_part_text(_), do: ""
+  defp build_anthropic_messages(_), do: []
 end

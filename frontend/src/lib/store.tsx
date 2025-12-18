@@ -107,7 +107,7 @@ const createInitialThread = (): ScriptThread => ({
   title: 'New Script',
   messages: [],
   prompt: '',
-  model: 'gemini-2.5-flash',
+  model: 'claude-sonnet-4-20250514',
   generatedScript: null,
   createdAt: new Date(),
   updatedAt: new Date(),

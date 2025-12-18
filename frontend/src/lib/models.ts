@@ -1,9 +1,10 @@
 /**
- * Gemini model configurations
- * Based on: https://ai.google.dev/gemini-api/docs/models
+ * AI Model configurations
+ * Claude models for text/script generation
+ * Gemini models for image generation
  */
 
-export interface GeminiModel {
+export interface AIModel {
   id: string;
   name: string;
   description: string;
@@ -12,74 +13,62 @@ export interface GeminiModel {
   maxInputTokens: number;
   maxOutputTokens: number;
   category: 'latest' | 'stable' | 'preview' | 'experimental';
+  provider: 'anthropic' | 'google';
 }
 
-// Text generation models (for scripts)
-export const TEXT_MODELS: GeminiModel[] = [
+// For backward compatibility
+export type GeminiModel = AIModel;
+
+// Text generation models (Claude for scripts)
+export const TEXT_MODELS: AIModel[] = [
   {
-    id: 'gemini-2.5-flash',
-    name: 'Gemini 2.5 Flash',
-    description: 'Fast & intelligent, best for large scale processing',
-    supportsImages: true,
+    id: 'claude-sonnet-4-20250514',
+    name: 'Claude Sonnet 4',
+    description: 'Best balance of intelligence and speed (recommended)',
+    supportsImages: false,
     supportsImageGeneration: false,
-    maxInputTokens: 1048576,
-    maxOutputTokens: 65536,
-    category: 'stable',
-  },
-  {
-    id: 'gemini-2.5-pro',
-    name: 'Gemini 2.5 Pro',
-    description: 'Advanced thinking model for complex problems',
-    supportsImages: true,
-    supportsImageGeneration: false,
-    maxInputTokens: 1048576,
-    maxOutputTokens: 65536,
-    category: 'stable',
-  },
-  {
-    id: 'gemini-2.5-flash-lite',
-    name: 'Gemini 2.5 Flash-Lite',
-    description: 'Ultra fast, cost-efficient',
-    supportsImages: true,
-    supportsImageGeneration: false,
-    maxInputTokens: 1048576,
-    maxOutputTokens: 65536,
-    category: 'stable',
-  },
-  {
-    id: 'gemini-3-pro-preview',
-    name: 'Gemini 3 Pro (Preview)',
-    description: 'Most intelligent model, best reasoning',
-    supportsImages: true,
-    supportsImageGeneration: false,
-    maxInputTokens: 1048576,
-    maxOutputTokens: 65536,
-    category: 'preview',
-  },
-  {
-    id: 'gemini-2.0-flash',
-    name: 'Gemini 2.0 Flash',
-    description: 'Second gen workhorse, 1M context',
-    supportsImages: true,
-    supportsImageGeneration: false,
-    maxInputTokens: 1048576,
-    maxOutputTokens: 8192,
+    maxInputTokens: 200000,
+    maxOutputTokens: 64000,
     category: 'latest',
+    provider: 'anthropic',
   },
   {
-    id: 'gemini-2.0-flash-lite',
-    name: 'Gemini 2.0 Flash-Lite',
-    description: 'Fast and cost-efficient',
-    supportsImages: true,
+    id: 'claude-3-5-sonnet-20241022',
+    name: 'Claude 3.5 Sonnet',
+    description: 'Previous gen Sonnet, excellent performance',
+    supportsImages: false,
     supportsImageGeneration: false,
-    maxInputTokens: 1048576,
+    maxInputTokens: 200000,
     maxOutputTokens: 8192,
     category: 'stable',
+    provider: 'anthropic',
+  },
+  {
+    id: 'claude-3-5-haiku-20241022',
+    name: 'Claude 3.5 Haiku',
+    description: 'Fast and cost-efficient for simple tasks',
+    supportsImages: false,
+    supportsImageGeneration: false,
+    maxInputTokens: 200000,
+    maxOutputTokens: 8192,
+    category: 'stable',
+    provider: 'anthropic',
+  },
+  {
+    id: 'claude-opus-4-20250514',
+    name: 'Claude Opus 4',
+    description: 'Most intelligent model for complex reasoning',
+    supportsImages: false,
+    supportsImageGeneration: false,
+    maxInputTokens: 200000,
+    maxOutputTokens: 32000,
+    category: 'latest',
+    provider: 'anthropic',
   },
 ];
 
-// Image generation models (for thumbnails)
-export const IMAGE_GENERATION_MODELS: GeminiModel[] = [
+// Image generation models (Gemini for thumbnails)
+export const IMAGE_GENERATION_MODELS: AIModel[] = [
   {
     id: 'gemini-2.5-flash-image',
     name: 'Gemini 2.5 Flash Image',
@@ -89,6 +78,7 @@ export const IMAGE_GENERATION_MODELS: GeminiModel[] = [
     maxInputTokens: 65536,
     maxOutputTokens: 32768,
     category: 'stable',
+    provider: 'google',
   },
   {
     id: 'gemini-3-pro-image-preview',
@@ -99,6 +89,7 @@ export const IMAGE_GENERATION_MODELS: GeminiModel[] = [
     maxInputTokens: 65536,
     maxOutputTokens: 32768,
     category: 'preview',
+    provider: 'google',
   },
   {
     id: 'gemini-2.0-flash-preview-image-generation',
@@ -109,6 +100,7 @@ export const IMAGE_GENERATION_MODELS: GeminiModel[] = [
     maxInputTokens: 32768,
     maxOutputTokens: 8192,
     category: 'preview',
+    provider: 'google',
   },
 ];
 
@@ -125,17 +117,26 @@ export const ASPECT_RATIOS = [
 ];
 
 // Helper to get model by ID
-export function getModelById(id: string): GeminiModel | undefined {
+export function getModelById(id: string): AIModel | undefined {
   return ALL_MODELS.find(m => m.id === id);
 }
 
 // Helper to get category badge color
-export function getCategoryColor(category: GeminiModel['category']): string {
+export function getCategoryColor(category: AIModel['category']): string {
   switch (category) {
     case 'stable': return 'bg-emerald-600';
     case 'latest': return 'bg-blue-600';
     case 'preview': return 'bg-amber-600';
     case 'experimental': return 'bg-purple-600';
+    default: return 'bg-slate-600';
+  }
+}
+
+// Helper to get provider badge color
+export function getProviderColor(provider: AIModel['provider']): string {
+  switch (provider) {
+    case 'anthropic': return 'bg-orange-600';
+    case 'google': return 'bg-blue-500';
     default: return 'bg-slate-600';
   }
 }

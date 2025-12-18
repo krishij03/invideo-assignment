@@ -11,6 +11,17 @@ defmodule Backend.Config do
           export GEMINI_API_KEY="..."
       """
   end
+
+  @spec anthropic_api_key!() :: String.t()
+  def anthropic_api_key! do
+    Application.get_env(:backend, :anthropic_api_key) ||
+      System.get_env("ANTHROPIC_API_KEY") ||
+      raise """
+      ANTHROPIC_API_KEY is missing.
+
+      Set it in your environment (do not commit it), for example:
+
+          export ANTHROPIC_API_KEY="..."
+      """
+  end
 end
-
-

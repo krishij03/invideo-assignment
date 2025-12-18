@@ -31,7 +31,7 @@ export function ScriptGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [model, setModel] = useState('gemini-2.5-flash');
+  const [model, setModel] = useState('claude-sonnet-4-20250514');
   const [sidebarOpen, setSidebarOpen] = useState(false); // Default closed on mobile
 
   const messagesEndRef = useRef<HTMLDivElement>(null);

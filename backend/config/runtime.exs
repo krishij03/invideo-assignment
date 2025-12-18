@@ -41,6 +41,7 @@ cors_origins =
 config :backend, :cors_origins, cors_origins
 
 config :backend, :gemini_api_key, System.get_env("GEMINI_API_KEY")
+config :backend, :anthropic_api_key, System.get_env("ANTHROPIC_API_KEY")
 
 # Supabase JWT secret for token verification
 # Get this from: Supabase Dashboard > Project Settings > API > JWT Secret
